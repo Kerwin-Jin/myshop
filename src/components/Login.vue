@@ -6,10 +6,10 @@
             </div>
             <el-form class="login_form" :model="loginForm" :rules="loginRules" ref="formRef">
                 <el-form-item label-width="0px" prop="username">
-                    <el-input prefix-icon="iconfont icon-yonghu" v-model="loginForm.username"></el-input>
+                    <el-input prefix-icon="iconfont icon-user" v-model="loginForm.username"></el-input>
                 </el-form-item>
                 <el-form-item label-width="0px" prop="password">
-                    <el-input prefix-icon="iconfont icon-mima" v-model="loginForm.password" type="password"></el-input>
+                    <el-input prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password"></el-input>
                 </el-form-item>
                 <el-form-item class="btns">
                     <el-button type="primary" @click="login">登录</el-button>
@@ -27,8 +27,8 @@ export default {
         return{
             //登录表单的数据绑定对象
             loginForm:{
-                username:'',
-                password:''
+                username:'admin',
+                password:'123456'
             },
 
             //表单的验证规则对象
