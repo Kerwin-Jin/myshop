@@ -62,7 +62,7 @@
                     <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
                     <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)"></el-button>
                     <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-                       <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+                       <el-button type="warning" icon="el-icon-setting" size="mini" @click="showSetRoleDialog(scope.row)"></el-button>
                     </el-tooltip>
                 </template>
             </el-table-column>
@@ -138,6 +138,33 @@
                 <el-button type="primary" @click="editUserInfo">确 定</el-button>
             </span>
         </el-dialog>
+
+        <!-- 设置用户角色对话框 -->
+        <el-dialog
+        title="设置角色"
+        :visible.sync="isShowSetRoleDialog"
+        width="30%"
+        @close='setRoleDialogClosed'
+        >
+            <div>
+                <p>用户名：{{userinfo.username}}</p>
+                <p>当前的角色：{{userinfo.role_name}}</p>
+                <p>
+                     <el-select v-model="selectedRoleId" placeholder="请选择">
+                        <el-option
+                        v-for="item in rolesList"
+                        :key="item.id"
+                        :label="item.roleName"
+                        :value="item.id">
+                        </el-option>
+                    </el-select>
+                </p>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="isShowSetRoleDialog = false">取 消</el-button>
+                <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -174,6 +201,7 @@ export default {
             total:0,        //返回的用户总个数
             dialogVisible:false,    //控制添加用户对话框是否显示
             editDialogVisible:false,//控制修改用户信息对话框是否显示
+            isShowSetRoleDialog:false,
 
             //用于用户表单数据的绑定
             userForm:{
@@ -215,7 +243,16 @@ export default {
                     {validator:checkMobile,trigger:'blur'},
 
                 ]
-            }
+            },
+
+            //设置用户角色时保存信息的对象
+            userinfo:{},
+
+            // 保存角色列表
+            rolesList:[],
+
+            selectedRoleId:''
+
         }
     },
 
@@ -351,6 +388,47 @@ export default {
                     message: '已取消删除'
                 });          
             });
+        },
+
+        // 设置用户角色对话框
+        showSetRoleDialog(roleInfo){
+            //将表格中的数据保存下来在对话框中要用
+            this.userinfo = roleInfo
+
+            //获取角色列表
+            this.$http.get("roles")
+            .then(res=>{
+                if(res.data.meta.status!==200){
+                    return this.$message.error('获取角色列表失败')
+                }
+
+                this.rolesList = res.data.data
+            })
+
+            //显示对话框
+            this.isShowSetRoleDialog = true
+
+        },
+
+        // 保存用户的角色
+        saveRoleInfo(){
+            this.$http.put(`users/${this.userinfo.id}/role`,{rid:this.selectedRoleId})
+            .then(res=>{
+                if(!res.data.meta.status==200)
+                    return this.$message.error('角色分配失败')
+                
+                this.$message.success(res.data.meta.msg)
+
+                this.isShowSetRoleDialog = false
+                this.UserList()
+
+            })
+        },
+
+        //当设置角色的对话框关闭之后执行的操作
+        setRoleDialogClosed(){
+            this.selectedRoleId = ''
+            this.userinfo = {}
         }
     }
 }
