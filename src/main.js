@@ -29,6 +29,16 @@ Vue.config.productionTip = false
 //注册全局组件
 Vue.component('tree-table',TreeTable)
 
+// 全局过滤器
+Vue.filter('dataFilter',time=>{
+  let date = new Date(time)
+  let year = date.getFullYear()
+  let month = (date.getMonth()+1+'').padStart(2,'0')
+  let day = (date.getDay()+'').padStart(2,'0')
+
+  return `${year}-${month}-${day}`
+})
+
 new Vue({
   router,
   store,
